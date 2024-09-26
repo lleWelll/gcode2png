@@ -54,6 +54,10 @@ pip3 install -r requirements.txt
 
 ```shell
 python ./gcode2png.py --help
+
+python ./gcode2png.py --moves=true --show=true --drop=0 tests/test.gcode
+python ./gcode2png.py --moves=true --drop=0 tests/test.gcode tests/test.png
+
 ```
 
 ## Develop
