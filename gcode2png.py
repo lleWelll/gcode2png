@@ -33,6 +33,7 @@ class GcodeRenderer:
         self.moves = False
         self.show = False
         self.bed = False
+        self.drop_initial_lines = 5
 
         self.scene = None
 
@@ -48,15 +49,15 @@ class GcodeRenderer:
         self.coords["support"]["z"] = [0]
 
         self.bedsize = [250, 210]  # should match bed_texture.jpg
-        black = (0, 0, 0)
-        white = (1, 1, 1)
+        # black = (0, 0, 0)
+        # white = (1, 1, 1)
         red = (1, 0, 0)
-        orange = (1, 0.5, 0)
+        # orange = (1, 0.5, 0)
         lightgrey = (0.7529, 0.7529, 0.7529)
         blue = (0, 0.4980, 0.9960)
         mediumgrey = (0.7, 0.7, 0.7)
         darkgrey1 = (0.4509, 0.4509, 0.4509)
-        darkgrey2 = (0.5490, 0.5490, 0.5490)
+        # darkgrey2 = (0.5490, 0.5490, 0.5490)
 
         self.bgcolor = darkgrey1
         self.supportcolor = lightgrey
@@ -76,6 +77,7 @@ class GcodeRenderer:
         target: str,
         imgx: int,
         imgy: int,
+        drop: int,
     ):
         """Run general processing
 
@@ -98,6 +100,7 @@ class GcodeRenderer:
         self.imgwidth = imgx
         self.imgheight = imgy
         self.show = show
+        self.drop_initial_lines = drop
 
         if self.show:
             mlab.options.offscreen = False
@@ -238,9 +241,9 @@ class GcodeRenderer:
             return
 
         logger.info(
-            "dropping first 5 lines from model to avoid rendering weird purge lines"
+            "dropping first %s lines from model to avoid rendering weird purge lines" % self.drop_initial_lines
         )
-        for i in range(5):
+        for i in range(self.drop_initial_lines):
             if len(self.coords["object"]["x"]) > 0:
                 self.coords["object"]["x"].pop(0)
                 self.coords["object"]["y"].pop(0)
@@ -382,9 +385,10 @@ class GcodeRenderer:
 @click.option("--show", default=False, help="Show preview window")
 @click.option("--imgx", default=1600, help="Saved image X in pixels")
 @click.option("--imgy", default=1200, help="Saved image Y in pixels")
+@click.option("--drop", default=5, help="Drop that many initial lines before processing the rest of the gcode")
 @click.argument("source", type=click.Path(exists=True))
 @click.argument("target", type=click.Path(), required=False)
-def gcode2png(source, bed, supports, moves, show, target, imgx, imgy):
+def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop):
     """Process input filename and based on file name create PNG file
 
     Example input is test.gcode, then output will be test.png
@@ -405,6 +409,7 @@ def gcode2png(source, bed, supports, moves, show, target, imgx, imgy):
         target=target,
         imgx=imgx,
         imgy=imgy,
+        drop=drop,
     )
 
 

@@ -43,7 +43,10 @@ Not so great examples:
 
 ## Requirements
 
+Tested under Ubuntu 22.04
+
 ```shell
+suto apt install -y mayavi
 pip3 install -r requirements.txt
 ```
 

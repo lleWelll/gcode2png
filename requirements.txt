@@ -1,4 +1,5 @@
 click
 mayavi
 numpy
+pyqt5
 vtk==9.2.6
