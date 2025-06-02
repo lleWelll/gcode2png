@@ -6,6 +6,7 @@ import os
 import re
 
 from mayavi import mlab
+from pygments.lexer import default
 from tvtk.api import tvtk
 
 from gcodeParser import *
@@ -78,6 +79,7 @@ class GcodeRenderer:
         imgx: int,
         imgy: int,
         drop: int,
+        layer:int
     ):
         """Run general processing
 
@@ -90,6 +92,7 @@ class GcodeRenderer:
             target(str): filename to write output image, if set
             imgx(int): image size x to render (pixels)
             imgy(int): image size y to render (pixels)
+            layer(int): layer to render
 
         """
         self.path = path
@@ -101,6 +104,7 @@ class GcodeRenderer:
         self.imgheight = imgy
         self.show = show
         self.drop_initial_lines = drop
+        self.layer = layer
 
         if self.show:
             mlab.options.offscreen = False
@@ -170,7 +174,7 @@ class GcodeRenderer:
         model = parser.parseFile(path)
         logger.info("model.layers=%s ..." % len(model.layers))
 
-        for layer in model.layers:
+        for layer in model.layers[:self.layer]:
             for seg in layer.segments:
                 self.processSegment(seg, seg.style)
 
@@ -386,9 +390,10 @@ class GcodeRenderer:
 @click.option("--imgx", default=1600, help="Saved image X in pixels")
 @click.option("--imgy", default=1200, help="Saved image Y in pixels")
 @click.option("--drop", default=5, help="Drop that many initial lines before processing the rest of the gcode")
+@click.option("--layer", type=int, default=None)
 @click.argument("source", type=click.Path(exists=True))
 @click.argument("target", type=click.Path(), required=False)
-def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop):
+def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop, layer):
     """Process input filename and based on file name create PNG file
 
     Example input is test.gcode, then output will be test.png
@@ -410,6 +415,7 @@ def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop):
         imgx=imgx,
         imgy=imgy,
         drop=drop,
+        layer=layer
     )
 
 
