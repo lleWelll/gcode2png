@@ -174,7 +174,10 @@ class GcodeRenderer:
         model = parser.parseFile(path)
         logger.info("model.layers=%s ..." % len(model.layers))
 
-        for layer in model.layers[:self.layer]:
+        layer_limit = min(len(model.layers), self.layer)
+
+        logger.info("processing layers with limit=%s" % layer_limit)
+        for layer in model.layers[:layer_limit]:
             for seg in layer.segments:
                 self.processSegment(seg, seg.style)
 
