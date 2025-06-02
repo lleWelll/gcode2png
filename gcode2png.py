@@ -66,7 +66,8 @@ class GcodeRenderer:
         self.bedcolor = mediumgrey
         self.movecolor = blue
 
-        mlab.options.offscreen = True
+        if not self.show:
+            mlab.options.offscreen = False
 
     def run(
         self,
@@ -79,7 +80,9 @@ class GcodeRenderer:
         imgx: int,
         imgy: int,
         drop: int,
-        layer:int
+        layer:int,
+        azimuth:int,
+        elevation:int
     ):
         """Run general processing
 
@@ -105,6 +108,8 @@ class GcodeRenderer:
         self.show = show
         self.drop_initial_lines = drop
         self.layer = layer
+        self.azimuth = azimuth
+        self.elevation = elevation
 
         if self.show:
             mlab.options.offscreen = False
@@ -359,7 +364,7 @@ class GcodeRenderer:
         )
         focalpoint = (obj_pos_x, obj_pos_y, obj_pos_z)
         # 225,45 is standard PrusaSlicer preview angle from point 0,0 but way higher, towards the center of the print object
-        mlab.view(azimuth=225, elevation=45, distance=distance, focalpoint=focalpoint)
+        mlab.view(azimuth=self.azimuth, elevation=self.elevation, distance=distance, focalpoint=focalpoint)
         logger.info("done")
 
     def showScene(self):
@@ -380,6 +385,13 @@ class GcodeRenderer:
 
         logger.info("preparing to save image")
         img_path = self.target
+
+        if os.path.isdir(img_path):
+            default_name = "target.png"
+            img_path = os.path.join(img_path, default_name)
+        else:
+            raise ValueError(f"target «{self.target}» is not directory")
+
         logger.info("mlab.savefig=%s" % img_path)
         mlab.savefig(img_path)
         logger.info("img.save=%s" % img_path)
@@ -394,9 +406,11 @@ class GcodeRenderer:
 @click.option("--imgy", default=1200, help="Saved image Y in pixels")
 @click.option("--drop", default=5, help="Drop that many initial lines before processing the rest of the gcode")
 @click.option("--layer", type=int, default=1000000000, help="Layers limitation in final image")
+@click.option("--azimuth", type=int, default=255, help="Camera azimuth angle from witch png image will be saved")
+@click.option("--elevation", type=int, default=45, help="Camera elevation from witch png image will be saved")
 @click.argument("source", type=click.Path(exists=True))
 @click.argument("target", type=click.Path(), required=False)
-def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop, layer):
+def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop, layer, azimuth, elevation):
     """Process input filename and based on file name create PNG file
 
     Example input is test.gcode, then output will be test.png
@@ -418,7 +432,9 @@ def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop, laye
         imgx=imgx,
         imgy=imgy,
         drop=drop,
-        layer=layer
+        layer=layer,
+        azimuth=azimuth,
+        elevation=elevation
     )
 
 
