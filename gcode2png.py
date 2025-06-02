@@ -393,7 +393,7 @@ class GcodeRenderer:
 @click.option("--imgx", default=1600, help="Saved image X in pixels")
 @click.option("--imgy", default=1200, help="Saved image Y in pixels")
 @click.option("--drop", default=5, help="Drop that many initial lines before processing the rest of the gcode")
-@click.option("--layer", type=int, default=None)
+@click.option("--layer", type=int, default=1000000000, help="Layers limitation in final image")
 @click.argument("source", type=click.Path(exists=True))
 @click.argument("target", type=click.Path(), required=False)
 def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop, layer):
