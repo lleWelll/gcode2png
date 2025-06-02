@@ -406,8 +406,8 @@ class GcodeRenderer:
 @click.option("--imgy", default=1200, help="Saved image Y in pixels")
 @click.option("--drop", default=5, help="Drop that many initial lines before processing the rest of the gcode")
 @click.option("--layer", type=int, default=1000000000, help="Layers limitation in final image")
-@click.option("--azimuth", type=int, default=255, help="Camera azimuth angle from witch png image will be saved")
-@click.option("--elevation", type=int, default=45, help="Camera elevation from witch png image will be saved")
+@click.option("--azimuth", type=int, default=255, help="Camera azimuth angle from witch png image will be saved, default = 255 (standard PrusaSlicer preview)")
+@click.option("--elevation", type=int, default=45, help="Camera elevation from witch png image will be saved, default = 45 (standard PrusaSlicer preview)")
 @click.argument("source", type=click.Path(exists=True))
 @click.argument("target", type=click.Path(), required=False)
 def gcode2png(source, bed, supports, moves, show, target, imgx, imgy, drop, layer, azimuth, elevation):
